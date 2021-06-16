@@ -42,4 +42,4 @@ jobs:
         uses: sudo-bot/action-docker-compose@latest
         with:
           # Command line arguments
-          cli-args: up -f docker-compose.simple.yml
+          cli-args: -f docker-compose.simple.yml up
