@@ -23,7 +23,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 5s
     
   apache:
     build: ./webserver
@@ -39,6 +39,14 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - gibbon-root:${GIBBON_BASEDIR}
+    healthcheck:
+      test: ["CMD", "curl", "http://${GIBBON_SITENAME}:80"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 5s
+
+
 
   php:
     build: 
