@@ -18,6 +18,9 @@ FROM minimum as dev
 
 COPY ./docker-php-gibbonsetup /usr/local/bin/
 
+HEALTHCHECK --interval=5s --timeout=5s\
+  CMD php -r "echo '0' || exit 1"
+
 RUN apk add rsync \
     && cp "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini" \
     && chmod 0755 /usr/local/bin/docker-php-gibbonsetup \
