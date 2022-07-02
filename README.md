@@ -2,7 +2,7 @@ The Dockerfiles in php and webserver create minimal images with apache, configur
 
 If you migrate your database put your databasedump in ./db/initdb/ before the first time you run docker-compose up -d. Adjustments to the database, like migration to another URL have to be done by you either in advance in the dump or via SQL using the mysql client.
 
-Some of the work here is derived [from the excellent work of Paul Lebmann](https://github.com/PaulLebmann/docker-gibbonedu). The view here is to somewhat cut the fat of his work to make it less opinionated. The hope is that through simplicity it is easier to work with later.
+Some of the work here is derived [from the excellent work of Paul Lebmann](https://github.com/PaulLebmann/docker-gibbonedu). The view here is to somewhat cut the fat of his work to make it less opinionated. Through simplicity, I hope it is easier to work with and customize for your needs.
 
 # Setup
 Depending on your school's size, the setup might vary somewhat.
