@@ -28,3 +28,6 @@ else
     sed -i "s/$databasePassword = .*$/$databasePassword = '${GIBBON_DB_PASSWORD}';/g" ${GIBBON_BASEDIR}/config.php
     sed -i "s/$databaseName = .*$/$databaseName = '${GIBBON_DB_DB}';/g" ${GIBBON_BASEDIR}/config.php
 fi
+
+cd /var/www/html/
+composer install

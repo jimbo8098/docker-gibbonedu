@@ -25,3 +25,5 @@ RUN apk add rsync \
     && cp "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini" \
     && chmod 0755 /usr/local/bin/docker-php-gibbonsetup \
     && sed -i "`wc -l < /usr/local/bin/docker-php-entrypoint`i\\/usr/local/bin/docker-php-gibbonsetup\\" /usr/local/bin/docker-php-entrypoint
+
+COPY --from=composer/composer /usr/bin/composer /usr/bin/composer
