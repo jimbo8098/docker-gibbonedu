@@ -1,49 +1,39 @@
-# Gibbon in Docker 
-## What this setup does
 The Dockerfiles in php and webserver create minimal images with apache, configured for php-fpm, and php-fpm to enable gibbon to run.
-
-docker-compose.yml assumes there is an additional reverse proxy - in this case [jwilder/nginx-proxy](https://hub.docker.com/r/jwilder/nginx-proxy), either running in one container or running nginx and docker-gen separated, on the network "webfront".
-It further assumes there is an external network "backup" for accessing the database to create backups i.e. with [Bareos in Docker](https://github.com/barcus/bareos).
 
 If you migrate your database put your databasedump in ./db/initdb/ before the first time you run docker-compose up -d. Adjustments to the database, like migration to another URL have to be done by you either in advance in the dump or via SQL using the mysql client.
 
+# Setup
+Depending on your school's size, the setup might vary somewhat.
 
-## What you have to do
-### Basic Setup
-If you want to run gibbon without a separate reverse proxy you can use
-docker-compose.simple.yml:
+## General First Time Setup
+Regardless of which way you proceed, the installer will do a few things and leave some of the rest to you. The general flow is as follows:
 
-1. Clone the repo
-2. rename docker-compose.simple.yml to docker-compose.yml
-3. copy example.env to .env
-4. change the values in .env to match your domain, and LOCALE and passwords
-5. run `bash ./crontab\_create.sh`
-6. run `docker-compose pull`
-7. run `docker-compose build`
-8. run `docker-compose up -d`
-9. visit your server the way you set it up either via a domain name or via ip:80 and start the Gibbon setup
+1. Bring the containers up using one of the methods in the two setup sections below.
+2. Connect to the site through your browser.
+3. The installer page should show. Follow the on screen instructions.
+4. On the database step, make sure to use the hostname of the `db` container or your service endpoint depending on your deployment method. This should ensure that traffic is correctly routed.
+5. Follow the post-install setps noted at https://docs.gibbonedu.org/administrators/getting-started/installing-gibbon/#post-install-server-config by execing into the container.
 
+## Testing/Small Setup
+Just run `docker-compose up`. A local version of Gibbon will be brought up based on the version specified within the `.env` file. You can consider using `docker swarm` for a kube-like install.
 
-### Setup with reverse Proxy and TLS
-1. Clone the repo
-2. run `docker network create webfront`
-3. run `docker network create backup`
-4. setup jwilder/nginx-proxy in a separate docker-compose project. If you plan on using it in production add [letsencrypt-nginx-proxy-companion](https://github.com/JrCs/docker-letsencrypt-nginx-proxy-companion) to your nginx-proxy setup
-5. add the network webfront to nginx-proxy
-6. copy example.env to .env
-7. change the values in .env to match your domain, and LOCALE and passwords
-8. run `bash ./crontab\_create.sh`
-9. run `docker-compose pull`
-10. run `docker-compose build`
-11. run `docker-compose up -d`
-12. visit your server the way you set it up either via its domain name
+## Larger setup
+For a larger environment, you can expand the Apache and PHP containers. These use a background layer to connect the different containers to each other. Only the Apache container has exposed ports. This could more easily be orchestrated using Kubernetes.
 
-## Backupstrategy
-As mentioned above a separate backup network is created for using backup software like Bareos to backup the database.
-The volume where your gibbon data resides should also be backed up. Since I use a docker volume I tend to mount it in a bareos filedaemon container and use bareos.
+### Other considerations
+- Backups: While no backups are taken in the original configuration, the data is written to a docker volume. Therefore you can take backups of that volume on your host. Your best bet is to connect to create a cron which connects to the `db` host and takes the backup manually.
+- Scalability: Note the "Larger Setup" section above which goes through considerations for a large scale setup. Performance so far has been tested on a Lenovo T450 so is hardly production scale!
 
-Another option would be to use a directory on your host to mount into $GIBBON\_BASEDIR and any backup mechanism for your docker host system.
-Backupscripts, and scripts for backup rotation are also added to the database container and executed by the crontab container. So you find your databasebackups under ./db/backup.
+## Backups
+The section below references the docker-compose configuration but serve to give a good idea of how the backups could be taken.
 
-Therefore you should be fine using tar, rsync, borg or any other tool on those two directories.
+## SQL
+Data is stored in two docker volumes:
 
+- `gibbon-db-data`
+- `gibbon-db-log`
+
+It's advisable to take the backups through a different container. This eases the update process for the individual containers by easing deviation from the original containers.
+
+## Site/User Data
+For the site content, which includes the user uploads, this is located in the volume named `gibbon-root` in the docker-compose file. By backing this volume up, you can take a backup of the data present at the time. This also allows for easier data swapping should you wish to wipe and reinstall Gibbon.
