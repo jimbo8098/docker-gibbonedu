@@ -39,7 +39,9 @@ services:
       - gibbon-root:${GIBBON_BASEDIR}
     networks:
       - default
-      - webfront
+      - frontend
+    ports:
+      - 8080:80
 
   php:
     build: 
@@ -94,9 +96,9 @@ volumes:
   gibbon-root:
 
 networks:
-  webfront:
-    external:
-      name: webfront
+  frontend:
+    name: frontend
+  backend:
+    name: backend
   backup:
-    external:
-      name: backup
+    name: backup
